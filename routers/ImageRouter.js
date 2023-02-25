@@ -2,6 +2,18 @@ const express = require("express");
 const router = express.Router();
 const pool = require("../db");
 
+router.get('/images', async (req, res) => {
+    try{
+        const query = 'select * from image;';
+        pool.query(query, (err, result) => {
+            if(err) throw err;
+            res.json(result.rows);
+        })
+    }catch(err){
+        console.log(err);
+    }
+})
+
 router.post("/images", async (req, res) => {
     try{
         let { name, link, type } = req.body;
