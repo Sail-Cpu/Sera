@@ -18,12 +18,26 @@ router.get('/images', async (req, res) => {
 })
 
 //Get image by id
-router.get(`/images/:imageId`, async (req, res) => {
+router.get(`/images/id/:imageId`, async (req, res) => {
     try{
         const imageId = req.params.imageId;
         const query = 'select * from image where id=$1';
         pool.query(query, [imageId], (err, result) => {
             if(err) throw err;
+            res.json(result.rows);
+        })
+    }catch(err){
+        console.log(err);
+    }
+})
+
+//Get all images by type
+router.get(`/images/type/:imageType`, async (req, res) => {
+    try{
+        const imageType = req.params.imageType;
+        const query = 'select * from image where type=$1';
+        pool.query(query, [imageType], (err, result) => {
+            if(err) throw err; 
             res.json(result.rows);
         })
     }catch(err){
