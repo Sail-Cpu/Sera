@@ -3,6 +3,7 @@ const router = express.Router();
 const pool = require("../db");
 const Parameter = require("../Parameter");
 
+//Get all authors
 router.get(`/authors`, async (req, res) => {
     try{
         let query = `select * from author`;
@@ -17,6 +18,7 @@ router.get(`/authors`, async (req, res) => {
     }
 })
 
+//Get author by id
 router.get(`/authors/:authorID`, async (req, res) => {
     let { authorID } = req.params;
     try{
@@ -30,6 +32,7 @@ router.get(`/authors/:authorID`, async (req, res) => {
     }
 })
 
+//Post author
 router.post(`/authors`, async (req, res) => {
     let { name, biography } = req.body;
     try{
@@ -49,6 +52,19 @@ router.post(`/authors`, async (req, res) => {
             }else{
                 res.send({error: 'Author already exist'})
             }
+        })
+    }catch(error){
+        console.log(error);
+    }
+})
+
+router.delete(`/authors/:authorId`, async (req, res) => {
+    try{
+        let { authorId } = req.params;
+        let update = `delete from author where id=$1 returning *`;
+        pool.query(update, [authorId], (error, result) => {
+            if (error) throw error;
+            res.send({data: result.rows, message: "The author has been successfully deleted"})
         })
     }catch(error){
         console.log(error);

@@ -1,31 +1,20 @@
 const express = require("express");
 const router = express.Router();
 const pool = require("../db");
-
-//GETTORS
-
-function Parameter(images, type, search, page, pageSize){
-    if(type) images = images.filter(image => image.type === type);
-    if(search) images = images.filter(image => image.name.includes(search));
-    if(!page && pageSize) images = images.slice(0, pageSize);
-    if(page && !pageSize) images = images.slice(page * 20, page * 20 + 20);
-    if(page && pageSize) images = images.slice(page * pageSize, page * pageSize + pageSize);
-    return images;
-}
+const Parameter = require("../Parameter");
 
 //Get all images
 router.get(`/images`, async (req, res) => {
     try{
-        let { type, search, page, page_size } = req.query;
         let query = 'select * from image;';
         pool.query(query, (err, result) => {
             if(err) throw err;
             let images = result.rows;
-            images = Parameter(images, type, search, parseInt(page), parseInt(page_size));
+            images = Parameter(images, req.query);
             res.send({data: images});
         })
-    }catch(err){
-        console.log(err);
+    }catch(error){
+        console.log(error);
     }
 })
 
@@ -43,7 +32,7 @@ router.get(`/images/:imageId`, async (req, res) => {
     }
 })
 
-//Post Image
+//Post image
 router.post("/images", async (req, res) => {
     let { name, link, type } = req.body;
     try{
@@ -73,6 +62,7 @@ router.post("/images", async (req, res) => {
     }
 })
 
+//Delete image
 router.delete(`/images/:imageId`, async (req, res) => {
     let { imageId } = req.params;
     try{
@@ -86,6 +76,7 @@ router.delete(`/images/:imageId`, async (req, res) => {
     }
 })
 
+//modify image
 router.patch(`/images/:imageId`, async (req, res) => {
     let { imageId } = req.params;
     let {name, link, type} = req.body;
