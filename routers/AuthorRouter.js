@@ -58,6 +58,7 @@ router.post(`/authors`, async (req, res) => {
     }
 })
 
+//Author delete
 router.delete(`/authors/:authorId`, async (req, res) => {
     try{
         let { authorId } = req.params;
@@ -70,5 +71,29 @@ router.delete(`/authors/:authorId`, async (req, res) => {
         console.log(error);
     }
 })
+
+//modify author
+router.patch(`/authors/:authorId`, async (req, res) => {
+    let { authorId } = req.params;
+    let { name, biography } = req.body;
+    try{
+        let query = `select * from author where id!=$3 and (name=$1 or biography=$2)`;
+        pool.query(query, [name, biography, authorId], (error, result) => {
+            if (error) throw error;
+            if(result.rowCount === 0){
+                let update = `update author set name=$1, biography=$2 where id=$3 returning *`;
+                pool.query(update, [name, biography, authorId], (error, result) => {
+                    if(error) throw error;
+                    res.send({data: result.rows, message: 'the author was modified successfully'});
+                })
+            }else{
+                res.send({error: 'image already exist'});
+            }
+        })
+    }catch(error){
+        console.log(error);
+    }
+})
+
 
 module.exports = router;
