@@ -31,8 +31,8 @@ router.get(`/images`, async (req, res) => {
 
 //Get image by id
 router.get(`/images/:imageId`, async (req, res) => {
+    const imageId = req.params.imageId;
     try{
-        const imageId = req.params.imageId;
         const query = 'select * from image where id=$1';
         pool.query(query, [imageId], (err, result) => {
             if(err) throw err;
@@ -45,8 +45,8 @@ router.get(`/images/:imageId`, async (req, res) => {
 
 //Post Image
 router.post("/images", async (req, res) => {
+    let { name, link, type } = req.body;
     try{
-        let { name, link, type } = req.body;
         const query = 'select * from image where name=$1 or link=$2';
         pool.query(query, [name, link], async (err, result) => {
             if(err) throw err;
@@ -74,13 +74,36 @@ router.post("/images", async (req, res) => {
 })
 
 router.delete(`/images/:imageId`, async (req, res) => {
+    let { imageId } = req.params;
     try{
-        let { imageId } = req.params;
         let update = `delete from image where id=$1 returning *`;
         pool.query(update, [imageId], async (error, result) => {
             if (error) throw error;
             res.send({data: result.rows, message: "The image has been successfully deleted"});
         });
+    }catch (error){
+        console.log(error);
+    }
+})
+
+router.patch(`/images/:imageId`, async (req, res) => {
+    let { imageId } = req.params;
+    let {name, link, type} = req.body;
+    try{
+        let query = `select * from image where id!=$3 and (name=$1 or link=$2)`;
+        pool.query(query, [name, link, imageId], (error, result) => {
+            if (error) throw error;
+            if(result.rowCount === 0){
+                let update = `update image set name=$1, link=$2, type=$3 where id=$4 returning *`;
+                pool.query(update, [name, link, type, imageId], (error, result) => {
+                    if(error) throw error;
+                    res.send({data: result.rows, message: 'the image was modified successfully'});
+                })
+            }else{
+                res.send({error: 'image already exist'});
+            }
+        })
+
     }catch (error){
         console.log(error);
     }
