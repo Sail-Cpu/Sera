@@ -25,7 +25,11 @@ router.get(`/authors/:authorID`, async (req, res) => {
         let query = `select * from author where id=$1`;
         pool.query(query, [authorID], (error, result) => {
             if (error) throw error;
-            res.send({data: result.rows});
+            if(result.rowCount > 0){
+                res.send({data: result.rows});
+            }else{
+                res.status(404).send({error: "Author does not exist"})
+            }
         })
     }catch(error){
         console.log(error);
@@ -44,13 +48,13 @@ router.post(`/authors`, async (req, res) => {
                 if(name.length >= 4){
                     pool.query(insert, [name, biography], (error, result) => {
                         if(error) throw error;
-                        res.send({data: result.rows, message: 'Author added successfully.'})
+                        res.send({data: result.rows, message: 'Author added successfully.'});
                     })
                 }else{
-                    res.send({author: 'The name is invalid'});
+                    res.status(400).send({error: 'The name is invalid'});
                 }
             }else{
-                res.send({error: 'Author already exist'})
+                res.status(400).send({error: 'Author already exist'});
             }
         })
     }catch(error){
@@ -65,7 +69,12 @@ router.delete(`/authors/:authorId`, async (req, res) => {
         let update = `delete from author where id=$1 returning *`;
         pool.query(update, [authorId], (error, result) => {
             if (error) throw error;
-            res.send({data: result.rows, message: "The author has been successfully deleted"})
+            if(result.rowCount > 0){
+                res.send({data: result.rows, message: "The author has been successfully deleted"});
+            }else{
+                res.status(404).send({error:"authors does not exist"});
+            }
+
         })
     }catch(error){
         console.log(error);
@@ -87,7 +96,7 @@ router.patch(`/authors/:authorId`, async (req, res) => {
                     res.send({data: result.rows, message: 'the author was modified successfully'});
                 })
             }else{
-                res.send({error: 'image already exist'});
+                res.status(400).send({error: 'image already exist'});
             }
         })
     }catch(error){

@@ -25,7 +25,11 @@ router.get(`/images/:imageId`, async (req, res) => {
         const query = 'select * from image where id=$1';
         pool.query(query, [imageId], (err, result) => {
             if(err) throw err;
-            res.send({data: result.rows});
+            if(result.rowCount > 0){
+                res.send({data: result.rows});
+            }else{
+                res.status(404).send({error: "Image does not exist"});
+            }
         })
     }catch(err){
         console.log(err);
@@ -47,13 +51,13 @@ router.post("/images", async (req, res) => {
                             res.send({data: result.rows, message:'image added successfully.'});
                         })
                     }else{
-                        res.send({error: 'the type is invalid, only : background, logo or poster can be entered.'});
+                        res.status(400).send({error: 'the type is invalid, only : background, logo or poster can be entered.'});
                     }
                 }else{
-                    res.send({error: 'you must enter all the following parameters: name, link and type(background, logo, poster).'});
+                    res.status(400).send({error: 'you must enter all the following parameters: name, link and type(background, logo, poster).'});
                 }
             }else{
-                res.send({error: 'the image already exists.'});
+                res.status(400).send({error: 'the image already exists.'});
             }
         })
         
@@ -69,7 +73,12 @@ router.delete(`/images/:imageId`, async (req, res) => {
         let update = `delete from image where id=$1 returning *`;
         pool.query(update, [imageId], async (error, result) => {
             if (error) throw error;
-            res.send({data: result.rows, message: "The image has been successfully deleted"});
+            if(result.rowCount > 0){
+                res.send({data: result.rows, message: "The image has been successfully deleted"});
+            }else{
+                res.status(404).send({error: "Image does not exist"});
+            }
+
         });
     }catch (error){
         console.log(error);
@@ -91,7 +100,7 @@ router.patch(`/images/:imageId`, async (req, res) => {
                     res.send({data: result.rows, message: 'the image was modified successfully'});
                 })
             }else{
-                res.send({error: 'image already exist'});
+                res.status(400).send({error: 'image already exist'});
             }
         })
 
