@@ -20,7 +20,11 @@ router.get(`/images`, async (req, res) => {
 
 //Get image by id
 router.get(`/images/:imageId`, async (req, res) => {
-    const imageId = req.params.imageId;
+    const imageId = parseInt(req.params.imageId);
+    if(isNaN(imageId)){
+        res.status(400).send({error: 'the parameter must be an integer'});
+        return;
+    }
     try{
         const query = 'select * from image where id=$1';
         pool.query(query, [imageId], (err, result) => {
@@ -68,7 +72,11 @@ router.post("/images", async (req, res) => {
 
 //Delete image
 router.delete(`/images/:imageId`, async (req, res) => {
-    let { imageId } = req.params;
+    const imageId = parseInt(req.params.imageId);
+    if(isNaN(imageId)){
+        res.status(409).send({error: 'the parameter must be an integer'});
+        return;
+    }
     try{
         let update = `delete from image where id=$1 returning *`;
         pool.query(update, [imageId], async (error, result) => {
@@ -87,7 +95,11 @@ router.delete(`/images/:imageId`, async (req, res) => {
 
 //modify image
 router.patch(`/images/:imageId`, async (req, res) => {
-    let { imageId } = req.params;
+    const imageId = parseInt(req.params.imageId);
+    if(isNaN(imageId)){
+        res.status(409).send({error: 'the parameter must be an integer'});
+        return;
+    }
     let {name, link, type} = req.body;
     try{
         let query = `select * from image where id!=$3 and (name=$1 or link=$2)`;

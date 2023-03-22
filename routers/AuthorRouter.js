@@ -20,7 +20,11 @@ router.get(`/authors`, async (req, res) => {
 
 //Get author by id
 router.get(`/authors/:authorID`, async (req, res) => {
-    let { authorID } = req.params;
+    const authorID = parseInt(req.params.authorID);
+    if(isNaN(authorID)){
+        res.status(409).send({error: 'the parameter must be an integer'});
+        return;
+    }
     try{
         let query = `select * from author where id=$1`;
         pool.query(query, [authorID], (error, result) => {
@@ -64,8 +68,12 @@ router.post(`/authors`, async (req, res) => {
 
 //Author delete
 router.delete(`/authors/:authorId`, async (req, res) => {
+    const authorID = parseInt(req.params.authorID);
+    if(isNaN(authorID)){
+        res.status(409).send({error: 'the parameter must be an integer'});
+        return;
+    }
     try{
-        let { authorId } = req.params;
         let update = `delete from author where id=$1 returning *`;
         pool.query(update, [authorId], (error, result) => {
             if (error) throw error;
@@ -83,7 +91,11 @@ router.delete(`/authors/:authorId`, async (req, res) => {
 
 //modify author
 router.patch(`/authors/:authorId`, async (req, res) => {
-    let { authorId } = req.params;
+    const authorID = parseInt(req.params.authorID);
+    if(isNaN(authorID)){
+        res.status(409).send({error: 'the parameter must be an integer'});
+        return;
+    }
     let { name, biography } = req.body;
     try{
         let query = `select * from author where id!=$3 and (name=$1 or biography=$2)`;
