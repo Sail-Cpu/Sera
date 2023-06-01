@@ -9,9 +9,7 @@ router.get(`/images`, async (req, res) => {
         let query = 'select * from image;';
         pool.query(query, (err, result) => {
             if(err) throw err;
-            let images = result.rows;
-            images = Parameter(images, req.query);
-            res.send({data: images});
+            res.send({data: result.rows});
         })
     }catch(error){
         console.log(error);

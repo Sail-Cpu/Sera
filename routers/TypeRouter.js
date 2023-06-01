@@ -21,7 +21,7 @@ router.get(`/types/:typeID`, async (req, res) => {
         return;
     }
     try {
-        let query = `select * from type where id=$1`;
+        let query = `select t.id, t.name, t.japan_name, t.description, i.link As background_image from type t join image i on t.background_id = i.id where t.id=$1`;
         pool.query(query, [typeID], (error, result) => {
             if(error) throw error;
             if(result.rowCount > 0){

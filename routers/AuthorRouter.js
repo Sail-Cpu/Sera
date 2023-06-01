@@ -10,7 +10,7 @@ router.get(`/authors`, async (req, res) => {
         pool.query(query, (error, result) => {
             if (error) throw error;
             let authors = result.rows;
-            authors = Parameter(authors, req.query);
+            //authors = Parameter(authors, req.query);
             res.send({data: authors});
         })
     }catch(error){
