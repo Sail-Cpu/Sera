@@ -9,7 +9,7 @@ router.get(`/mangas`, async (req, res) => {
             let allResult = result.rows.map(row => ({...row, type: 'Manga'}));
             let mangas = CollectionParameter(req.query, allResult);
             let mangaPage = GeneralParameter(req.query, mangas);
-            res.send({data: mangaPage});
+            res.send({nbMangas: result.rowCount, data: mangaPage});
         })
     }catch (error){
         console.log(error);
@@ -27,7 +27,8 @@ router.get(`/mangas/:mangaID`, async (req, res) => {
         pool.query(query, [mangaID], (error, result) => {
             if (error) throw error;
             if(result.rowCount > 0){
-                res.send({data: result.rows});
+                let allResult = result.rows.map(row => ({...row, type: 'Manga'}));
+                res.send({data: allResult});
             }else{
                 res.status(404).send({error: "Manga does not exist"})
             }

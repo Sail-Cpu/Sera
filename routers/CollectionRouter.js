@@ -39,7 +39,8 @@ router.get(`/collections/:collectionID`, async (req, res) => {
         pool.query(query, [collectionID], (error, result) => {
             if (error) throw error;
             if(result.rowCount > 0){
-                res.send({data: result.rows});
+                let allResult = result.rows.map(row => ({...row, type: 'Manga'}));
+                res.send({data: allResult});
             }else{
                 res.status(404).send({error: "Collection does not exist"})
             }
