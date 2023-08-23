@@ -9,7 +9,7 @@ router.get(`/mangas`, async (req, res) => {
             let allResult = result.rows.map(row => ({...row, type: 'Manga'}));
             let mangas = CollectionParameter(req.query, allResult);
             let mangaPage = GeneralParameter(req.query, mangas);
-            res.send({nbMangas: result.rowCount, data: mangaPage});
+            res.send({nbMangas: mangas.length, data: mangaPage});
         })
     }catch (error){
         console.log(error);

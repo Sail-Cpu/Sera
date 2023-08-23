@@ -21,7 +21,7 @@ router.get(`/collections`, async (req, res) => {
             }));
             let collections = CollectionParameter(req.query, allResult);
             let collectionPage = GeneralParameter(req.query, collections);
-            res.send({ data: collectionPage });
+            res.send({ nbCollections: collections.length, data: collectionPage });
         });
     }catch (error){
         console.log(error);
